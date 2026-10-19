@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#89A482">
+  <meta name="description" content="A heartfelt apology, shared with care.">
+  <title>A little note for you</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #89A482;
+      --cream: #fffdf4;
+      --ink: #303226;
+      --muted: #777763;
+      --blue: #2373F4;
+      --blue-light: #578EF5;
+      --line: #e8e0c9;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    .page { min-height: 100svh; display: grid; place-items: center; padding: 48px 20px; overflow: hidden; }
+    .letter-stage { width: min(100%, 690px); display: grid; place-items: center; }
+    .letter-cover { position: relative; width: min(100%, 520px); text-align: center; animation: arrive .9s cubic-bezier(.2,.8,.2,1) both; }
+    .cover-kicker { margin: 0 0 19px; color: var(--cream); font-size: .7rem; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+    .envelope { position: relative; width: 100%; aspect-ratio: 1.52; perspective: 1100px; filter: drop-shadow(0 25px 30px rgba(48, 50, 38, .25)); transition: transform .3s ease, filter .3s ease; }
+    .letter-cover:not(.is-opening):hover .envelope { transform: translateY(-3px); filter: drop-shadow(0 30px 35px rgba(48, 50, 38, .3)); }
+    .envelope-back { position: absolute; inset: 0; overflow: hidden; border: 1px solid #d4c69f; border-radius: 7px; background: #eee5c9; }
+    .envelope-letter { position: absolute; z-index: 1; top: 8%; left: 11%; width: 78%; height: 78%; display: grid; place-content: center; gap: 8px; color: var(--ink); background: var(--cream); border: 1px solid #e5dcc2; box-shadow: 0 7px 18px rgba(48, 50, 38, .16), 0 20px 35px rgba(48, 50, 38, .12); font-family: var(--serif); transition: transform .8s cubic-bezier(.2,.75,.2,1); }
+    .envelope-letter strong { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 400; }
+    .envelope-letter span { color: var(--muted); font-size: .85rem; font-style: italic; }
+    .envelope-pocket { position: absolute; z-index: 3; inset: 0; background: linear-gradient(145deg, #f0e7ca, #dfd2ad); clip-path: polygon(0 0, 50% 57%, 100% 0, 100% 100%, 0 100%); }
+    .envelope-flap { position: absolute; z-index: 4; inset: 0 0 auto; height: 59%; background: linear-gradient(160deg, #f5edda, #dfd1ab); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0; backface-visibility: hidden; transition: transform .72s cubic-bezier(.2,.75,.2,1); }
+    .envelope-address { position: absolute; z-index: 4; right: 10%; bottom: 12%; color: #777763; font-family: var(--serif); font-size: clamp(.9rem, 2.5vw, 1.15rem); font-style: italic; text-align: right; }
+    .envelope-seal { position: absolute; z-index: 5; top: 52%; left: 50%; width: 49px; aspect-ratio: 1; display: grid; place-items: center; color: white; background: var(--blue); border: 3px solid rgba(255,253,244,.85); border-radius: 50%; box-shadow: 0 3px 9px rgba(48,50,38,.2); font-size: 1.15rem; transform: translate(-50%, -50%); transition: opacity .3s, transform .3s; }
+    .open-button { display: inline-flex; min-height: 48px; align-items: center; gap: 10px; margin: 25px 0 0; padding: 0 22px; color: white; background: var(--blue); border: 1px solid var(--blue); border-radius: 2px; font: 550 .9rem var(--sans); cursor: pointer; transition: background .2s, transform .2s, box-shadow .2s; }
+    .open-button:hover { background: #1d62d4; box-shadow: 0 6px 18px #2373F430; transform: translateY(-1px); }
+    .open-button:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
+    .cover-caption { margin: 13px 0 0; color: rgba(255,253,244,.92); font-family: var(--serif); font-size: .95rem; font-style: italic; }
+    .doodle { position: absolute; z-index: 7; width: var(--doodle-size, 30px); aspect-ratio: 1; color: var(--doodle-color, var(--cream)); pointer-events: none; opacity: 0; animation: doodle-appear .5s var(--doodle-delay, 0s) ease-out forwards, doodle-float 3.8s ease-in-out calc(var(--doodle-delay, 0s) + .5s) infinite; }
+    .doodle svg { display: block; width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.1; }
+    .doodle path, .doodle circle { stroke-dasharray: 120; stroke-dashoffset: 120; animation: doodle-draw 1.2s var(--doodle-delay, 0s) ease-out forwards; }
+    .doodle-heart { top: 18%; left: 1%; --doodle-size: 35px; --doodle-color: #fffdf4; --doodle-delay: .15s; }
+    .doodle-sparkle { top: 33%; right: 1%; --doodle-size: 29px; --doodle-color: #dbe7ff; --doodle-delay: .35s; }
+    .doodle-star { bottom: 21%; left: 9%; --doodle-size: 23px; --doodle-color: #dbe7ff; --doodle-delay: .55s; }
+    .doodle-heart-small { right: 10%; bottom: 18%; --doodle-size: 25px; --doodle-color: #fffdf4; --doodle-delay: .75s; }
+    .letter-cover.is-opening { animation: cover-away .55s .3s ease forwards; pointer-events: none; }
+    .letter-cover.is-opening .envelope-flap { transform: rotateX(180deg); }
+    .letter-cover.is-opening .envelope-letter { z-index: 6; transform: translateY(-54%); }
+    .letter-cover.is-opening .envelope-seal { opacity: 0; transform: translate(-50%, -50%) scale(.7); }
+    .note { position: relative; width: min(100%, 690px); padding: clamp(34px, 7vw, 70px); background: rgba(255, 253, 244, .9); border: 1px solid rgba(220, 211, 184, .85); border-radius: 4px; box-shadow: 0 28px 72px rgba(48, 50, 38, .18), 0 5px 16px rgba(48, 50, 38, .09); }
+    .note.is-open { animation: arrive .9s cubic-bezier(.2,.8,.2,1) both; }
+    .note[hidden], .letter-cover[hidden] { display: none; }
+    .note::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(233, 226, 216, .62); pointer-events: none; }
+    .eyebrow { margin: 0 0 26px; color: var(--blue); font-size: .7rem; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { max-width: 540px; margin: 0; font-family: var(--serif); font-size: clamp(3.2rem, 9vw, 6.2rem); font-weight: 400; letter-spacing: -.065em; line-height: .98; }
+    h1 em { color: var(--blue); font-weight: 400; }
+    .divider { display: flex; align-items: center; gap: 12px; width: 74px; margin: 34px 0 28px; color: var(--blue-light); }
+    .divider::before, .divider::after { content: ""; height: 1px; flex: 1; background: #d9d0af; }
+    .divider span { font-size: 12px; }
+    .message { max-width: 500px; color: #555950; font-family: var(--serif); font-size: clamp(1.05rem, 2.2vw, 1.23rem); line-height: 1.85; }
+    .message p { margin: 0 0 18px; }
+    .signature { margin: 32px 0 0; color: var(--ink); font-family: var(--serif); font-size: 1.28rem; font-style: italic; }
+    .signature span { display: block; margin-top: 6px; color: var(--muted); font-family: var(--sans); font-size: .78rem; font-style: normal; letter-spacing: .03em; }
+    .response { margin-top: 42px; padding-top: 22px; border-top: 1px solid var(--line); }
+    .response p { margin: 0 0 14px; color: var(--muted); font-size: .83rem; line-height: 1.6; }
+    .music-player { display: block; width: min(100%, 360px); margin: 0 0 18px; accent-color: var(--blue); }
+    .music-help { margin-top: -6px !important; font-size: .72rem !important; }
+    .small-note { margin: 15px 0 0 !important; font-size: .72rem !important; }
+    .sprig { position: absolute; width: 100px; height: 160px; top: -36px; right: 4%; opacity: .42; transform: rotate(13deg); }
+    .sprig path, .sprig ellipse { fill: none; stroke: var(--blue-light); stroke-width: 1.2; stroke-dasharray: 500; stroke-dashoffset: 500; animation: sprig-draw 2s .45s ease-out forwards; }
+    .sprig ellipse { stroke-dasharray: 20; stroke-dashoffset: 20; }
+    .leaf { position: fixed; top: -24px; width: 12px; height: 19px; border-radius: 0 100% 0 100%; background: var(--leaf-color, var(--blue-light)); opacity: .5; pointer-events: none; animation: drift linear forwards; }
+    .leaf::after { content: ""; position: absolute; top: 2px; left: 6px; width: 1px; height: 15px; background: rgba(255, 253, 244, .66); transform: rotate(8deg); }
+    @keyframes arrive { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes cover-away { to { opacity: 0; transform: translateY(-12px); visibility: hidden; } }
+    @keyframes drift { to { transform: translate3d(var(--drift), 110vh, 0) rotate(460deg); opacity: 0; } }
+    @keyframes doodle-appear { to { opacity: 1; } }
+    @keyframes doodle-float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-7px) rotate(4deg); } }
+    @keyframes doodle-draw { to { stroke-dashoffset: 0; } }
+    @keyframes sprig-draw { to { stroke-dashoffset: 0; } }
+    @media (max-width: 520px) {
+      .page { padding: 24px 14px; }
+      .note { padding: 42px 27px; }
+      .note::before { inset: 7px; }
+      .letter-cover { width: min(100%, 440px); }
+      .envelope-seal { width: 42px; }
+      .eyebrow { margin-bottom: 23px; }
+      .sprig { width: 66px; top: -29px; right: 6%; }
+      .divider { margin: 28px 0 22px; }
+      .response { margin-top: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="letter-stage" aria-label="A letter for Chinnu">
+      <div class="letter-cover" id="letter-cover">
+        <p class="cover-kicker">A little note for Chinnu</p>
+        <span class="doodle doodle-heart" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40C19 35 7 28 7 18C7 9 19 6 24 16C29 6 41 9 41 18C41 28 29 35 24 40Z"/></svg></span>
+        <span class="doodle doodle-sparkle" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4C25 17 31 23 44 24C31 25 25 31 24 44C23 31 17 25 4 24C17 23 23 17 24 4Z"/><path d="M39 5L40 10L45 11L40 12L39 17L38 12L33 11L38 10Z"/></svg></span>
+        <span class="doodle doodle-star" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4L28 19L43 24L28 28L24 44L20 28L5 24L20 19Z"/></svg></span>
+        <span class="doodle doodle-heart-small" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 39C20 35 10 29 10 20C10 12 20 9 24 18C28 9 38 12 38 20C38 29 28 35 24 39Z"/></svg></span>
+        <div class="envelope" aria-hidden="true">
+          <div class="envelope-back"></div>
+          <div class="envelope-letter"><strong>With care</strong><span>There’s a song inside</span></div>
+          <div class="envelope-pocket"></div>
+          <div class="envelope-flap"></div>
+          <div class="envelope-address">For Chinnu<br>With care, Dinnu</div>
+          <div class="envelope-seal">✳</div>
+        </div>
+        <button class="open-button" id="open-letter" type="button">Open your letter <span aria-hidden="true">↗</span></button>
+        <p class="cover-caption">A song and a note, just for you</p>
+      </div>
+
+    <article class="note" id="letter" aria-labelledby="headline" hidden>
+      <svg class="sprig" viewBox="0 0 100 160" aria-hidden="true"><path d="M22 150C34 113 44 74 65 17M40 93C22 89 15 77 13 63c17 2 27 12 27 30ZM51 67c19-5 27-17 29-32-18 5-27 15-29 32ZM31 121c-15-2-23-11-27-24 15 1 24 8 27 24ZM60 43c-1-15 6-25 18-32 2 14-3 25-18 32Z"/><ellipse cx="67" cy="16" rx="2" ry="4"/></svg>
+      <p class="eyebrow" id="greeting">A note for Chinnu</p>
+      <h1 id="headline" tabindex="-1">I’m <em>sorry.</em></h1>
+      <div class="divider" aria-hidden="true"><span>✳</span></div>
+
+      <!-- PERSONALIZE: edit the recipient, message, and sign-off below. -->
+      <div class="message" id="message">
+        <p>Dear Chinnu,</p>
+        <p>I know I made a mistake with the compliments and the name-changing. I shouldn’t have done either, and I’m truly sorry. I shared that as a goodbye, not because I was afraid of losing her—but I understand that it still hurt you, and that’s on me.</p>
+        <p>I’m sorry for everything, and for hurting you so much. I swear I won’t repeat this. If you’re willing, please give me one last chance to make things right. I know I have to show you through my actions, not just promise it.</p>
+      </div>
+      <p class="signature">With care,<span id="sender">Dinnu</span></p>
+
+      <div class="response">
+        <p>There’s no pressure to reply. If you’d like to talk, I’m here.</p>
+        <div class="music">
+          <p>A song for you</p>
+          <audio class="music-player" id="letter-song" controls preload="auto" aria-label="Baby O Baby">
+            <source src="Baby%20O%20Baby.mp3" type="audio/mpeg">
+            Your browser does not support audio playback.
+          </audio>
+          <p class="music-help">If it doesn’t start automatically, press play in the player above.</p>
+        </div>
+        <p class="small-note">Take all the time you need.</p>
+      </div>
+    </article>
+    </section>
+  </main>
+  <script>
+    // A soft drift of leaves; skipped for people who prefer reduced motion.
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const leafColors = ['#578EF5', '#2373F4', '#fffdf4', '#6e8d60'];
+      for (let i = 0; i < 18; i++) {
+        const leaf = document.createElement('span');
+        leaf.className = 'leaf';
+        leaf.setAttribute('aria-hidden', 'true');
+        leaf.style.left = `${4 + Math.random() * 92}%`;
+        leaf.style.setProperty('--drift', `${Math.random() * 130 - 65}px`);
+        leaf.style.setProperty('--leaf-color', leafColors[Math.floor(Math.random() * leafColors.length)]);
+        leaf.style.width = `${9 + Math.random() * 7}px`;
+        leaf.style.height = `${15 + Math.random() * 9}px`;
+        leaf.style.animationDuration = `${14 + Math.random() * 16}s`;
+        leaf.style.animationDelay = `${Math.random() * -24}s`;
+        document.body.append(leaf);
+      }
+    }
+
+    const cover = document.querySelector('#letter-cover');
+    const openLetterButton = document.querySelector('#open-letter');
+    const letter = document.querySelector('#letter');
+    const song = document.querySelector('#letter-song');
+    const songHelp = document.querySelector('.music-help');
+    const headline = document.querySelector('#headline');
+
+    openLetterButton.addEventListener('click', () => {
+      openLetterButton.disabled = true;
+      cover.classList.add('is-opening');
+
+      // Start playback directly from the tap so browsers allow the audio.
+      song.play().then(() => {
+        songHelp.textContent = 'Now playing “Baby O Baby”.';
+      }).catch(() => {
+        songHelp.textContent = 'Press play in the player above to start the song.';
+      });
+
+      const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 850;
+      window.setTimeout(() => {
+        cover.hidden = true;
+        letter.hidden = false;
+        letter.classList.add('is-open');
+        headline.focus({ preventScroll: true });
+      }, delay);
+    });
+
+  </script>
+</body>
+</html>
